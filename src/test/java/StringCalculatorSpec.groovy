@@ -72,5 +72,16 @@ class StringCalculatorSpec extends Specification {
         calculator.add('//[%%]\n1050%%8%%10,20')==38
     }
 
+    def "there can be multiple custom delimiters"(){
+        expect:
+        calculator.add("//[*][%]\n1*2%3")==6
+        calculator.add("//[&][#][@][!]\n1&7#2@1!9")==20
+    }
+
+    def "multiple custom delimiters can be longer than one char"(){
+        expect:
+        calculator.add("//[***][%%][^%]\n1^%2***3%%0,0\n0")
+    }
+
 
 }

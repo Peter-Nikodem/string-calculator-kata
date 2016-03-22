@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
@@ -43,23 +44,35 @@ public class StringCalculator {
 
     private String handleOptinalDelimiterDefiningLine(String numbers) {
         if (isDelimiterDefiningLinePresent(numbers)) {
-            String customDelimiter = getDelimiter(numbers);
+            String customDelimitersDefinition = getDelimiterDefinitions(numbers);
+            for (String customDelimiter : retrieveDelimiters(customDelimitersDefinition)) {
+                numbers = replaceDelimiterWithTheDefault(customDelimiter, numbers);
+            }
             numbers = removeDelimiterDefiningLine(numbers);
-            return replaceDelimiterWithTheDefault(customDelimiter, numbers);
+            return numbers;
         }
         return numbers;
+    }
+
+    private List<String> retrieveDelimiters(String definition) {
+        List<String> delimiters = new ArrayList<>();
+        while (definition.startsWith("[")) {
+            delimiters.add(definition.substring(1, definition.indexOf("]")));
+            definition = definition.substring(definition.indexOf("]")+1);
+        }
+        if (!definition.isEmpty()){
+            delimiters.add(definition);
+        }
+
+        return delimiters;
     }
 
     private boolean isDelimiterDefiningLinePresent(String numbers) {
         return numbers.startsWith("//");
     }
 
-    private String getDelimiter(String numbers) {
-        String delimiter = numbers.substring(2,numbers.indexOf('\n'));
-        if (delimiter.length()==1) {
-            return delimiter;
-        }
-        return delimiter.substring(1, delimiter.length() - 1);
+    private String getDelimiterDefinitions(String numbers) {
+        return  numbers.substring(2,numbers.indexOf('\n'));
     }
 
     private String replaceDelimiterWithTheDefault(String delimiter, String numbers) {
