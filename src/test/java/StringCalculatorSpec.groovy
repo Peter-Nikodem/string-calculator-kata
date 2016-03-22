@@ -60,5 +60,11 @@ class StringCalculatorSpec extends Specification {
         ex.message == 'negatives not allowed: -1,-4'
     }
 
+    def "numbers greater than 1000 are ignored"(){
+        expect:
+        calculator.add('2,1001') == 2
+        calculator.add('324345,7,20,999,0,1010') == 1026
+    }
+
 
 }

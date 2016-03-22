@@ -1,5 +1,6 @@
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.*;
@@ -16,8 +17,11 @@ public class StringCalculator {
         if (numbersString.isEmpty()) {
             return 0;
         }
-        return getAllNumbers(numbersString)
-                .collect(summingInt(Integer::intValue));
+        return add(getAllNumbers(numbersString));
+    }
+
+    private int add(Stream<Integer> numbers){
+        return numbers.collect(summingInt(Integer::intValue));
     }
 
     private Stream<Integer> getAllNumbers(String numbers) {
@@ -25,16 +29,17 @@ public class StringCalculator {
         numbers = replaceDelimiterWithTheDefault(NEW_LINE_DELIMITER,
                 numbers);
         String[] separatedNumbers = numbers.split(DEFAULT_DELIMITER_STRING);
-        Stream<Integer> allNumbers = Arrays.asList(separatedNumbers).
+        Supplier<Stream<Integer>> allNumbers = () -> Arrays.asList(separatedNumbers).
                 stream().
-                map(Integer::parseInt);
-        List<Integer> negativeNumbers = allNumbers.
+                map(Integer::parseInt).
+                filter(this::isNotOverThousand);
+        List<Integer> negativeNumbers = allNumbers.get().
                 filter(this::isNegative).
                 collect(toList());
         if (!negativeNumbers.isEmpty()) {
             throw new IllegalArgumentException(prepareNegativeNumbersErrorMessage(negativeNumbers));
         }
-        return allNumbers;
+        return allNumbers.get();
     }
 
     private String handleOptinalDelimiterDefiningLine(String numbers) {
@@ -71,6 +76,10 @@ public class StringCalculator {
             errorMessage.append(i);
         }
         return errorMessage.toString();
+    }
+
+    private boolean isNotOverThousand(Integer integer) {
+        return integer<=1000;
     }
 
     private boolean isNegative(Integer integer) {
