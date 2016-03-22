@@ -7,7 +7,8 @@ public class StringCalculator {
             return 0;
         }
         int sum = 0;
-        String[] separatedNumbers = numbers.split(",");
+        String normalizedNumbers = numbers.replace('\n', ',');
+        String[] separatedNumbers = normalizedNumbers.split(",");
         for (String number : separatedNumbers) {
             sum += Integer.parseInt(number);
         }
