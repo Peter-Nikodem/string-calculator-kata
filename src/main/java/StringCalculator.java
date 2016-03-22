@@ -9,9 +9,8 @@ import static java.util.stream.Collectors.*;
  * @author Peter Nikodem
  */
 public class StringCalculator {
-    private static final char DEFAULT_DELIMITER = ',';
-    private static final String DEFAULT_DELIMITER_STRING = ",";
-    private static final char NEW_LINE_DELIMITER = '\n';
+    private static final String DEFAULT_DELIMITER = ",";
+    private static final String NEW_LINE_DELIMITER = "\n";
 
     public int add(String numbersString) {
         if (numbersString.isEmpty()) {
@@ -28,7 +27,7 @@ public class StringCalculator {
         numbers = handleOptinalDelimiterDefiningLine(numbers);
         numbers = replaceDelimiterWithTheDefault(NEW_LINE_DELIMITER,
                 numbers);
-        String[] separatedNumbers = numbers.split(DEFAULT_DELIMITER_STRING);
+        String[] separatedNumbers = numbers.split(DEFAULT_DELIMITER);
         Supplier<Stream<Integer>> allNumbers = () -> Arrays.asList(separatedNumbers).
                 stream().
                 map(Integer::parseInt).
@@ -44,7 +43,7 @@ public class StringCalculator {
 
     private String handleOptinalDelimiterDefiningLine(String numbers) {
         if (isDelimiterDefiningLinePresent(numbers)) {
-            char customDelimiter = getDelimiter(numbers);
+            String customDelimiter = getDelimiter(numbers);
             numbers = removeDelimiterDefiningLine(numbers);
             return replaceDelimiterWithTheDefault(customDelimiter, numbers);
         }
@@ -55,16 +54,20 @@ public class StringCalculator {
         return numbers.startsWith("//");
     }
 
-    private char getDelimiter(String numbers) {
-        return numbers.charAt(2);
+    private String getDelimiter(String numbers) {
+        String delimiter = numbers.substring(2,numbers.indexOf('\n'));
+        if (delimiter.length()==1) {
+            return delimiter;
+        }
+        return delimiter.substring(1, delimiter.length() - 1);
     }
 
-    private String replaceDelimiterWithTheDefault(char delimiter, String numbers) {
+    private String replaceDelimiterWithTheDefault(String delimiter, String numbers) {
         return numbers.replace(delimiter, DEFAULT_DELIMITER);
     }
 
     private String removeDelimiterDefiningLine(String numbers) {
-        return numbers.substring(4);
+        return numbers.substring(numbers.indexOf('\n')+1);
     }
 
     private String prepareNegativeNumbersErrorMessage(List<Integer> negativeNumbers) {

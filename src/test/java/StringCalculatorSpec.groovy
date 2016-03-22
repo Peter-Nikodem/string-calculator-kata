@@ -66,5 +66,11 @@ class StringCalculatorSpec extends Specification {
         calculator.add('324345,7,20,999,0,1010') == 1026
     }
 
+    def "delimiters can be of any length"(){
+        expect:
+        calculator.add('//[***]\n1***2***3')==6
+        calculator.add('//[%%]\n1050%%8%%10,20')==38
+    }
+
 
 }
