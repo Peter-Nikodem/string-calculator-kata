@@ -1,46 +1,79 @@
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.*;
 
 /**
  * @author Peter Nikodem
  */
 public class StringCalculator {
-    public int add(String numbers) {
-        if (numbers.isEmpty()) {
+    private static final char DEFAULT_DELIMITER = ',';
+    private static final String DEFAULT_DELIMITER_STRING = ",";
+    private static final char NEW_LINE_DELIMITER = '\n';
+
+    public int add(String numbersString) {
+        if (numbersString.isEmpty()) {
             return 0;
         }
-        if (numbers.startsWith("//")){
-            char newDelimiter = numbers.charAt(2);
-            numbers = numbers.substring(4);
-            numbers = numbers.replace(newDelimiter, ',');
-        }
-        String normalizedNumbers = numbers.replace('\n', ',');
-        String[] separatedNumbers = normalizedNumbers.split(",");
-        List<Integer> allNumbers = new ArrayList<>();
-        int sum = 0;
-        for (String number : separatedNumbers) {
-            allNumbers.add(Integer.parseInt(number));
-        }
-        List<Integer> negativeNumbers = allNumbers.stream().filter((i -> i<0)).collect(Collectors.toList());
-        if (!negativeNumbers.isEmpty()){
-            throw new IllegalArgumentException(prepareErrorMessage(negativeNumbers));
-        }
-        for (Integer number :allNumbers) {
-            sum += number;
-        }
-        return sum;
+        return getAllNumbers(numbersString)
+                .collect(summingInt(Integer::intValue));
     }
 
-    private String prepareErrorMessage(List<Integer> negativeNumbers) {
+    private Stream<Integer> getAllNumbers(String numbers) {
+        numbers = handleOptinalDelimiterDefiningLine(numbers);
+        numbers = replaceDelimiterWithTheDefault(NEW_LINE_DELIMITER,
+                numbers);
+        String[] separatedNumbers = numbers.split(DEFAULT_DELIMITER_STRING);
+        Stream<Integer> allNumbers = Arrays.asList(separatedNumbers).
+                stream().
+                map(Integer::parseInt);
+        List<Integer> negativeNumbers = allNumbers.
+                filter(this::isNegative).
+                collect(toList());
+        if (!negativeNumbers.isEmpty()) {
+            throw new IllegalArgumentException(prepareNegativeNumbersErrorMessage(negativeNumbers));
+        }
+        return allNumbers;
+    }
+
+    private String handleOptinalDelimiterDefiningLine(String numbers) {
+        if (isDelimiterDefiningLinePresent(numbers)) {
+            char customDelimiter = getDelimiter(numbers);
+            numbers = removeDelimiterDefiningLine(numbers);
+            return replaceDelimiterWithTheDefault(customDelimiter, numbers);
+        }
+        return numbers;
+    }
+
+    private boolean isDelimiterDefiningLinePresent(String numbers) {
+        return numbers.startsWith("//");
+    }
+
+    private char getDelimiter(String numbers) {
+        return numbers.charAt(2);
+    }
+
+    private String replaceDelimiterWithTheDefault(char delimiter, String numbers) {
+        return numbers.replace(delimiter, DEFAULT_DELIMITER);
+    }
+
+    private String removeDelimiterDefiningLine(String numbers) {
+        return numbers.substring(4);
+    }
+
+    private String prepareNegativeNumbersErrorMessage(List<Integer> negativeNumbers) {
         StringBuilder errorMessage = new StringBuilder();
         errorMessage.append("negatives not allowed: ");
         errorMessage.append(negativeNumbers.get(0));
-        for (Integer i : negativeNumbers.subList(1,negativeNumbers.size())){
+        for (Integer i : negativeNumbers.subList(1, negativeNumbers.size())) {
             errorMessage.append(',');
             errorMessage.append(i);
         }
         return errorMessage.toString();
+    }
+
+    private boolean isNegative(Integer integer) {
+        return integer<0;
     }
 }
