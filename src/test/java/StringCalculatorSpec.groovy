@@ -18,7 +18,7 @@ class StringCalculatorSpec extends Specification {
         calculator.add('657') == 657
     }
 
-    def "adding 2 numbers returns their sum"(){
+    def "adding 2 numbers returns their sum"() {
         expect:
         calculator.add('0,6') == 6
         calculator.add('5,6') == 11
@@ -26,22 +26,38 @@ class StringCalculatorSpec extends Specification {
         calculator.add('500,0') == 500
     }
 
-    def "adding unknown amount of numbers returns their sum"(){
+    def "adding unknown amount of numbers returns their sum"() {
         expect:
         calculator.add('0,1,3,5,7') == 16
         calculator.add('1,1,1,1,1,1,1,1') == 8
     }
 
-    def "adding supports new lines (as well as commas) as a delimiter"(){
+    def "adding supports new lines (as well as commas) as a delimiter"() {
         expect:
         calculator.add('1\n2,3') == 6
         calculator.add('2\n5\n3\n10\n100') == 120
     }
 
-    def "optional first line can define a new delimiter"(){
+    def "optional first line can define a new delimiter"() {
         expect:
         calculator.add(('//;\n1;2')) == 3
         calculator.add('//+\n5+6\n11,10') == 32
+    }
+
+    def "negative number is shown in the thrown exception"(){
+        when:
+        calculator.add('//+\n1+8,9\n-18')
+        then:
+        IllegalArgumentException ex = thrown()
+        ex.message == 'negatives not allowed: -18'
+    }
+
+    def "multiple negative numbers are all shown in the thrown exception"() {
+        when:
+        calculator.add('-1,7,-4')
+        then:
+        IllegalArgumentException ex = thrown()
+        ex.message == 'negatives not allowed: -1,-4'
     }
 
 
