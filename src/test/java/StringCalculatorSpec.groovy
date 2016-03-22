@@ -32,5 +32,11 @@ class StringCalculatorSpec extends Specification {
         calculator.add('1,1,1,1,1,1,1,1') == 8
     }
 
+    def "adding supports new lines (as well as commas) as a delimiter"(){
+        expect:
+        calculator.add('1\n2,3') == 6
+        calculator.add('2\n5\n3\n10\n100') == 120
+    }
+
 
 }
