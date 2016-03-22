@@ -38,5 +38,11 @@ class StringCalculatorSpec extends Specification {
         calculator.add('2\n5\n3\n10\n100') == 120
     }
 
+    def "optional first line can define a new delimiter"(){
+        expect:
+        calculator.add(('//;\n1;2')) == 3
+        calculator.add('//+\n5+6+11') == 22
+    }
+
 
 }
