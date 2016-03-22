@@ -26,5 +26,11 @@ class StringCalculatorSpec extends Specification {
         calculator.add('500,0') == 500
     }
 
+    def "adding unknown amount of numbers returns their sum"(){
+        expect:
+        calculator.add('0,1,3,5,7') == 16
+        calculator.add('1,1,1,1,1,1,1,1') == 8
+    }
+
 
 }
