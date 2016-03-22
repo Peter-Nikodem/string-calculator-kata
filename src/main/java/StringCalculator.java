@@ -4,12 +4,20 @@
 public class StringCalculator {
     public int add(String numbers) {
         if (numbers.isEmpty()) return 0;
-        String[] split = numbers.split(",");
-        if (split.length==1){
-            return Integer.parseInt(split[0]);
+        String[] separatedNumbers = numbers.split(",");
+        if (separatedNumbers.length==1){
+            return parseToInt(separatedNumbers[0]);
         } else {
-            return Integer.parseInt(split[0]) + Integer.parseInt(split[1]);
+            int sum=0;
+            for (String number:separatedNumbers) {
+                sum += parseToInt(number);
+            }
+            return sum;
         }
 
+    }
+
+    private int parseToInt(String s) {
+        return Integer.parseInt(s);
     }
 }
