@@ -11,22 +11,21 @@ import static java.util.stream.Collectors.*;
  */
 public class StringCalculator {
     private static final String DEFAULT_DELIMITER = ",";
-    private static final String NEW_LINE_DELIMITER = "\n";
 
     public int add(String numbersString) {
         if (numbersString.isEmpty()) {
             return 0;
         }
-        return add(getAllNumbers(numbersString));
+        return add(getAllEligibleNumbers(numbersString));
     }
 
     private int add(Stream<Integer> numbers){
         return numbers.collect(summingInt(Integer::intValue));
     }
 
-    private Stream<Integer> getAllNumbers(String numbers) {
+    private Stream<Integer> getAllEligibleNumbers(String numbers) {
         numbers = handleOptinalDelimiterDefiningLine(numbers);
-        numbers = replaceDelimiterWithTheDefault(NEW_LINE_DELIMITER,
+        numbers = replaceDelimiterWithTheDefault("\n",
                 numbers);
         String[] separatedNumbers = numbers.split(DEFAULT_DELIMITER);
         Supplier<Stream<Integer>> allNumbers = () -> Arrays.asList(separatedNumbers).
@@ -88,7 +87,7 @@ public class StringCalculator {
         errorMessage.append("negatives not allowed: ");
         errorMessage.append(negativeNumbers.get(0));
         for (Integer i : negativeNumbers.subList(1, negativeNumbers.size())) {
-            errorMessage.append(',');
+            errorMessage.append(DEFAULT_DELIMITER);
             errorMessage.append(i);
         }
         return errorMessage.toString();
