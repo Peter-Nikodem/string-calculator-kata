@@ -1,10 +1,19 @@
+import org.apache.logging.log4j.Logger
 import spock.lang.Specification
+
 
 /**
  * @author Peter Nikodem 
  */
 class StringCalculatorSpec extends Specification {
-    StringCalculator calculator = new StringCalculator();
+    StringCalculator calculator
+    Logger logger
+
+    def setup() {
+        calculator = new StringCalculator()
+        logger = Mock(Logger)
+        calculator.logger = logger;
+    }
 
     def "adding empty string returns 0"() {
         expect:
@@ -44,7 +53,7 @@ class StringCalculatorSpec extends Specification {
         calculator.add('//+\n5+6\n11,10') == 32
     }
 
-    def "negative number is shown in the thrown exception"(){
+    def "negative number is shown in the thrown exception"() {
         when:
         calculator.add('//+\n1+8,9\n-18')
         then:
@@ -60,27 +69,39 @@ class StringCalculatorSpec extends Specification {
         ex.message == 'negatives not allowed: -1,-4'
     }
 
-    def "numbers greater than 1000 are ignored"(){
+    def "numbers greater than 1000 are ignored"() {
         expect:
         calculator.add('2,1001') == 2
         calculator.add('324345,7,20,999,0,1010') == 1026
     }
 
-    def "delimiters can be of any length"(){
+    def "delimiters can be of any length"() {
         expect:
-        calculator.add('//[***]\n1***2***3')==6
-        calculator.add('//[%%]\n1050%%8%%10,20')==38
+        calculator.add('//[***]\n1***2***3') == 6
+        calculator.add('//[%%]\n1050%%8%%10,20') == 38
     }
 
-    def "there can be multiple custom delimiters"(){
+    def "there can be multiple custom delimiters"() {
         expect:
-        calculator.add("//[*][%]\n1*2%3")==6
-        calculator.add("//[&][#][@][!]\n1&7#2@1!9")==20
+        calculator.add(testedString) == result
+        where:
+        testedString                | result
+        "//[*][%]\n1*2%3"           | 6
+        "//[&][#][@][!]\n1&7#2@1!9" | 20
+
+
     }
 
-    def "multiple custom delimiters can be longer than one char"(){
+    def "multiple custom delimiters can be longer than one char"() {
         expect:
         calculator.add("//[***][%%][^%]\n1^%2***3%%0,0\n0")
+    }
+
+    def "result sum is logged after successful add"() {
+        when:
+        calculator.add("3,7,10");
+        then:
+        1 * logger.info(_)
     }
 
 

@@ -1,3 +1,6 @@
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -10,6 +13,8 @@ import static java.util.stream.Collectors.*;
  * @author Peter Nikodem
  */
 public class StringCalculator {
+
+    protected Logger logger = LogManager.getLogger(StringCalculator.class);
     private static final String DEFAULT_DELIMITER = ",";
 
     public int add(String numbersString) {
@@ -19,8 +24,14 @@ public class StringCalculator {
         return add(getAllEligibleNumbers(numbersString));
     }
 
-    private int add(Stream<Integer> numbers){
-        return numbers.collect(summingInt(Integer::intValue));
+    private int add(Stream<Integer> numbers) {
+        return logAndReturn(
+                numbers.collect(summingInt(Integer::intValue)));
+    }
+
+    private int logAndReturn(int sum) {
+        logger.info(sum);
+        return sum;
     }
 
     private Stream<Integer> getAllEligibleNumbers(String numbers) {
@@ -57,9 +68,9 @@ public class StringCalculator {
         List<String> delimiters = new ArrayList<>();
         while (definition.startsWith("[")) {
             delimiters.add(definition.substring(1, definition.indexOf("]")));
-            definition = definition.substring(definition.indexOf("]")+1);
+            definition = definition.substring(definition.indexOf("]") + 1);
         }
-        if (!definition.isEmpty()){
+        if (!definition.isEmpty()) {
             delimiters.add(definition);
         }
 
@@ -71,7 +82,7 @@ public class StringCalculator {
     }
 
     private String getDelimiterDefinitions(String numbers) {
-        return  numbers.substring(2,numbers.indexOf('\n'));
+        return numbers.substring(2, numbers.indexOf('\n'));
     }
 
     private String replaceDelimiterWithTheDefault(String delimiter, String numbers) {
@@ -79,7 +90,7 @@ public class StringCalculator {
     }
 
     private String removeDelimiterDefiningLine(String numbers) {
-        return numbers.substring(numbers.indexOf('\n')+1);
+        return numbers.substring(numbers.indexOf('\n') + 1);
     }
 
     private String prepareNegativeNumbersErrorMessage(List<Integer> negativeNumbers) {
@@ -94,10 +105,10 @@ public class StringCalculator {
     }
 
     private boolean isNotOverThousand(Integer integer) {
-        return integer<=1000;
+        return integer <= 1000;
     }
 
     private boolean isNegative(Integer integer) {
-        return integer<0;
+        return integer < 0;
     }
 }
